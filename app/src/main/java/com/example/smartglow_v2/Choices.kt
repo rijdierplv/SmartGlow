@@ -1,6 +1,8 @@
 package com.example.smartglow_v2
 
 import android.os.Bundle
+import android.content.Intent
+import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -15,6 +17,19 @@ class Choices : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        val loginButton: Button = findViewById(R.id.loginChoiceButton)
+        val signUpButton: Button = findViewById(R.id.signUpChoiceButton)
+
+        loginButton.setOnClickListener {
+            val intent = Intent(this, LogIn::class.java)
+            startActivity(intent)
+        }
+
+        signUpButton.setOnClickListener {
+            val intent = Intent(this, SignUp::class.java)
+            startActivity(intent)
         }
     }
 }

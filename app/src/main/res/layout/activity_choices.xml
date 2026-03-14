@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#003049"
-    tools:context=".WelcomeScreen">
+    tools:context=".Choices">
 
     <ImageView
         android:id="@+id/logo"
@@ -42,18 +42,7 @@
         app:layout_constraintTop_toBottomOf="@+id/smartglowtext"/>
 
     <Button
-        android:layout_width="275dp"
-        android:layout_height="54dp"
-        android:layout_marginTop="292dp"
-        android:backgroundTint="#F77F00"
-        app:layout_constraintEnd_toEndOf="@+id/smartglowtext"
-        app:layout_constraintStart_toStartOf="@+id/smartglowtext"
-        app:layout_constraintTop_toBottomOf="@+id/eldroidtext"
-        android:text="Sign Up"
-        android:textSize="20dp"
-        android:textStyle="bold"/>
-
-    <Button
+        android:id="@+id/loginChoiceButton"
         android:layout_width="275dp"
         android:layout_height="54dp"
         android:layout_marginTop="208dp"
@@ -64,6 +53,19 @@
         app:layout_constraintEnd_toEndOf="@+id/smartglowtext"
         app:layout_constraintStart_toStartOf="@+id/smartglowtext"
         app:layout_constraintTop_toBottomOf="@+id/eldroidtext" />
+
+    <Button
+        android:id="@+id/signUpChoiceButton"
+        android:layout_width="275dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="292dp"
+        android:backgroundTint="#F77F00"
+        app:layout_constraintEnd_toEndOf="@+id/smartglowtext"
+        app:layout_constraintStart_toStartOf="@+id/smartglowtext"
+        app:layout_constraintTop_toBottomOf="@+id/eldroidtext"
+        android:text="Sign Up"
+        android:textSize="20dp"
+        android:textStyle="bold"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
