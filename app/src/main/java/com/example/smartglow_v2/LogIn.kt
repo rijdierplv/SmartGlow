@@ -67,10 +67,18 @@ class LogIn : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, Dashboard::class.java)
-            startActivity(intent)
-            finish()
+            val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
+            val savedEmail = sharedPref.getString("email", null)
+            val savedPassword = sharedPref.getString("password", null)
+
+            if (email == savedEmail && password == savedPassword) {
+                Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, Dashboard::class.java)
+                startActivity(intent)
+                finish()
+            } else {
+                Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

@@ -89,6 +89,13 @@ class SignUp : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
+            with(sharedPref.edit()) {
+                putString("email", email)
+                putString("password", password)
+                apply()
+            }
+
             Toast.makeText(this, "Sign up successful", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, LogIn::class.java)
             startActivity(intent)
