@@ -90,7 +90,7 @@ class SignUp : AppCompatActivity() {
             }
 
             Toast.makeText(this, "Sign up successful", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, Dashboard::class.java)
+            val intent = Intent(this, LogIn::class.java)
             startActivity(intent)
             finish()
         }
