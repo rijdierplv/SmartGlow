@@ -2,7 +2,6 @@ package com.example.smartglow_v2
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -12,94 +11,118 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.database.FirebaseDatabase
 
 class SignUp : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_sign_up)
+
+        val emailInput: EditText = findViewById(R.id.emailinput)
+        val usernameInput: EditText = findViewById(R.id.userinput)
+        val passwordInput: EditText = findViewById(R.id.passwordinput)
+        val confirmPasswordInput: EditText = findViewById(R.id.confirminput)
+        val signupButton: Button = findViewById(R.id.signupbutton)
+        val backButton: ImageButton = findViewById(R.id.backbutton)
+        val loginText: TextView = findViewById(R.id.textrani)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        val backButton: ImageButton = findViewById(R.id.backbutton)
-        val usernameInput: EditText = findViewById(R.id.userinput)
-        val emailInput: EditText = findViewById(R.id.emailinput)
-        val passwordInput: EditText = findViewById(R.id.passwordinput)
-        val confirmInput: EditText = findViewById(R.id.confirminput)
-        val signUpButton: Button = findViewById(R.id.signupbutton)
-        val loginText: TextView = findViewById(R.id.textrani)
+        signupButton.setOnClickListener {
 
-        backButton.setOnClickListener {
-            finish()
-        }
-
-        loginText.setOnClickListener {
-            val intent = Intent(this, LogIn::class.java)
-            startActivity(intent)
-        }
-
-        signUpButton.setOnClickListener {
-            val username = usernameInput.text.toString().trim()
             val email = emailInput.text.toString().trim()
+            val username = usernameInput.text.toString().trim()
             val password = passwordInput.text.toString().trim()
-            val confirmPassword = confirmInput.text.toString().trim()
+            val confirmPassword = confirmPasswordInput.text.toString().trim()
 
-            if (username.isEmpty()) {
-                usernameInput.error = "Username is required"
-                usernameInput.requestFocus()
+            if (email.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (email.isEmpty()) {
-                emailInput.error = "Email is required"
-                emailInput.requestFocus()
-                return@setOnClickListener
-            }
-
-            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                emailInput.error = "Enter a valid email"
-                emailInput.requestFocus()
-                return@setOnClickListener
-            }
-
-            if (password.isEmpty()) {
-                passwordInput.error = "Password is required"
-                passwordInput.requestFocus()
-                return@setOnClickListener
-            }
-
-            if (password.length < 6) {
-                passwordInput.error = "Password must be at least 6 characters"
-                passwordInput.requestFocus()
-                return@setOnClickListener
-            }
-
-            if (confirmPassword.isEmpty()) {
-                confirmInput.error = "Please confirm your password"
-                confirmInput.requestFocus()
+            if (!isValidUsername(username)) {
+                Toast.makeText(
+                    this,
+                    "Username must be 3-20 characters and contain only letters, numbers, or underscore (_)",
+                    Toast.LENGTH_LONG
+                ).show()
                 return@setOnClickListener
             }
 
             if (password != confirmPassword) {
-                confirmInput.error = "Passwords do not match"
-                confirmInput.requestFocus()
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val sharedPref = getSharedPreferences("user_prefs", MODE_PRIVATE)
-            with(sharedPref.edit()) {
-                putString("email", email)
-                putString("password", password)
-                apply()
+            if (!isValidPassword(password)) {
+                Toast.makeText(
+                    this,
+                    "Password must be at least 8 characters and include a letter, number, and special character",
+                    Toast.LENGTH_LONG
+                ).show()
+                return@setOnClickListener
             }
 
-            Toast.makeText(this, "Sign up successful", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, LogIn::class.java)
-            startActivity(intent)
+            val database = FirebaseDatabase.getInstance(FIREBASE_DB_URL)
+            val usersRef = database.getReference("users")
+
+            val emailKey = encodeEmail(email)
+
+            usersRef.child(emailKey).get()
+                .addOnSuccessListener { snapshot ->
+
+                    if (snapshot.exists()) {
+                        Toast.makeText(this, "Email already registered", Toast.LENGTH_SHORT).show()
+                    } else {
+
+                        val userData = mapOf(
+                            "email" to email,
+                            "username" to username,
+                            "password" to password
+                        )
+
+                        usersRef.child(emailKey).setValue(userData)
+                            .addOnSuccessListener {
+
+                                Toast.makeText(this, "Account Created!", Toast.LENGTH_SHORT).show()
+
+                                startActivity(Intent(this, LogIn::class.java))
+                                finish()
+                            }
+                            .addOnFailureListener { e ->
+                                val msg = e.message ?: "Unknown error"
+                                Toast.makeText(this, "Failed to create account: $msg", Toast.LENGTH_LONG).show()
+                            }
+                    }
+                }
+        }
+
+        backButton.setOnClickListener {
+            startActivity(Intent(this, LogIn::class.java))
             finish()
         }
+
+        loginText.setOnClickListener {
+            startActivity(Intent(this, LogIn::class.java))
+            finish()
+        }
+    }
+
+    private fun isValidPassword(password: String): Boolean {
+        if (password.length < 8) return false
+        val hasLetter = password.any { it.isLetter() }
+        val hasDigit = password.any { it.isDigit() }
+        val hasSpecial = password.any { !it.isLetterOrDigit() }
+        return hasLetter && hasDigit && hasSpecial
+    }
+
+    private fun isValidUsername(username: String): Boolean {
+        return username.matches(Regex("^[A-Za-z0-9_]{3,20}$"))
     }
 }

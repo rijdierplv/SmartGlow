@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1095142397987",
+    "project_id": "eldroidproject-94df3",
+    "storage_bucket": "eldroidproject-94df3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1095142397987:android:80f92e255ecc8a5532f996",
+        "android_client_info": {
+          "package_name": "com.example.smartglow_v2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRmRm9c-4_vH-Y5tmUjUx4KptJEMdQsj4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
