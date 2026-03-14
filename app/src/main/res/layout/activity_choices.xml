@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#003049"
+    tools:context=".WelcomeScreen">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="197dp"
+        android:layout_height="197dp"
+        android:layout_marginTop="44dp"
+        android:background="@drawable/idea"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/smartglowtext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="SmartGlow"
+        android:textColor="@color/white"
+        android:textSize="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logo" />
+
+    <TextView
+        android:id="@+id/eldroidtext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="UCB-IT-ELDROID1-91988"
+        android:textColor="@color/white"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/smartglowtext"
+        app:layout_constraintStart_toStartOf="@+id/smartglowtext"
+        app:layout_constraintTop_toBottomOf="@+id/smartglowtext"/>
+
+    <Button
+        android:layout_width="275dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="292dp"
+        android:backgroundTint="#F77F00"
+        app:layout_constraintEnd_toEndOf="@+id/smartglowtext"
+        app:layout_constraintStart_toStartOf="@+id/smartglowtext"
+        app:layout_constraintTop_toBottomOf="@+id/eldroidtext"
+        android:text="Sign Up"
+        android:textSize="20dp"
+        android:textStyle="bold"/>
+
+    <Button
+        android:layout_width="275dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="208dp"
+        android:backgroundTint="#F77F00"
+        android:text="Log In"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/smartglowtext"
+        app:layout_constraintStart_toStartOf="@+id/smartglowtext"
+        app:layout_constraintTop_toBottomOf="@+id/eldroidtext" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
