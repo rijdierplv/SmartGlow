@@ -59,6 +59,7 @@
             android:gravity="center_vertical">
 
             <TextView
+                android:id="@+id/motionTile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="• Motion"
@@ -73,6 +74,7 @@
                 android:layout_weight="1" />
 
             <TextView
+                android:id="@+id/overrideTile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="• Override"
@@ -87,6 +89,7 @@
                 android:layout_weight="1"/>
 
             <TextView
+                android:id="@+id/nightTile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="• Night"
@@ -220,6 +223,7 @@
                 android:layout_marginEnd="20dp">
 
                 <TextView
+                    android:id="@+id/brightnessLevel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/inter"
@@ -239,6 +243,7 @@
 
             </LinearLayout>
             <TextView
+                android:id="@+id/brightnessLevelStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -366,7 +371,7 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:background="@drawable/clock"
+                android:background="@drawable/activity"
                 ></ImageView>
             <TextView
                 android:id="@+id/lastUpdateText"
@@ -432,48 +437,109 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#A6A3A3"
-        app:layout_constraintTop_toBottomOf="@id/Linear16"
-        android:layout_marginTop="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="70dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
     <LinearLayout
-        android:id="@+id/dashboardLinear"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/view1"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="20dp"
-        android:orientation="vertical"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent">
-        <ImageButton
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/dashboard"/>
-        <TextView
-            android:layout_width="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="horizontal">
+
+        <!-- LEFT -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Dashboard"
-            android:textColor="#FE9D16"/>
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/dashboardBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/dashboard"
+                android:backgroundTint="#FE9D16"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dashboard"
+                android:textColor="#FE9D16"/>
+
+        </LinearLayout>
+
+        <!-- CENTER -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/controlBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/preference"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Controls"
+                android:textColor="#A6A3A3"/>
+
+        </LinearLayout>
+
+        <!-- RIGHT -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/activityLogBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/activity"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Activity Log"
+                android:textColor="#A6A3A3"/>
+
+        </LinearLayout>
+
+        <!-- NEW FOURTH ITEM -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/user"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Profile"
+                android:textColor="#A6A3A3"/>
+
+        </LinearLayout>
 
     </LinearLayout>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/dashboardLinear"
-        app:layout_constraintTop_toBottomOf="@id/view1"
-        android:background="@android:color/transparent"
-        android:orientation="vertical"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent">
-        <ImageButton
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/control"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Controls"/>
 
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
