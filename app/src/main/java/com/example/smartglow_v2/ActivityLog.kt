@@ -31,10 +31,10 @@ class ActivityLog : AppCompatActivity() {
             insets
         }
 
-        val dashboardBtn  = findViewById<ImageButton>(R.id.dashboardBtn)
-        val controlBtn    = findViewById<ImageButton>(R.id.controlBtn)
-        val logContainer  = findViewById<LinearLayout>(R.id.logContainer)
-        val badgeCount    = findViewById<TextView>(R.id.badgeCount)
+        val dashboardBtn = findViewById<ImageButton>(R.id.dashboardBtn)
+        val controlBtn = findViewById<ImageButton>(R.id.controlBtn)
+        val logContainer = findViewById<LinearLayout>(R.id.logContainer)
+        val badgeCount = findViewById<TextView>(R.id.badgeCount)
 
         val logsRef = FirebaseDatabase.getInstance().getReference("pirLogs")
 
@@ -62,37 +62,66 @@ class ActivityLog : AppCompatActivity() {
                 badgeCount.visibility = View.VISIBLE
 
                 for (log in logs) {
-                    val status   = log.child("status").getValue(String::class.java) ?: ""
+                    val status = log.child("status").getValue(String::class.java) ?: ""
                     val datetime = log.child("datetime").getValue(String::class.java) ?: ""
-                    val motion   = log.child("motion").getValue(Boolean::class.java) ?: false
+                    val motion = log.child("motion").getValue(Boolean::class.java) ?: false
+                    val brightness = log.child("brightness").getValue(Int::class.java)
 
-                    val parts    = datetime.split(" ")
-                    val timePart = if (parts.size >= 3) "${parts[1].substring(0, 5)} ${parts[2]}"
-                    else datetime
+                    val parts = datetime.split(" ")
+                    val timePart = if (parts.size >= 3) {
+                        "${parts[1].take(5)} ${parts[2]}"
+                    } else {
+                        datetime
+                    }
+
                     val datePart = if (parts.isNotEmpty() && parts[0].length >= 10) {
-                        val month  = parts[0].substring(5, 7).toIntOrNull() ?: 0
-                        val day    = parts[0].substring(8, 10)
-                        val months = listOf("","Jan","Feb","Mar","Apr","May","Jun",
-                            "Jul","Aug","Sep","Oct","Nov","Dec")
+                        val month = parts[0].substring(5, 7).toIntOrNull() ?: 0
+                        val day = parts[0].substring(8, 10)
+                        val months = listOf(
+                            "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                        )
                         "${months.getOrElse(month) { "" }} $day"
-                    } else ""
-
-                    val isMotion     = status == "DETECTED" || status == "CLEAR"
-                    val iconRes      = when {
-                        isMotion                                    -> R.drawable.motion
-                        status.contains("ON", ignoreCase = true)   -> R.drawable.lightingbulb_on
-                        else                                        -> R.drawable.lightbulb
+                    } else {
+                        ""
                     }
-                    val titleText    = when (status) {
+
+                    val isMotionLog = status == "DETECTED" || status == "CLEAR"
+
+                    val iconRes = when {
+                        isMotionLog -> R.drawable.motion
+                        status.contains("ON", ignoreCase = true) ||
+                                status == "FULL BRIGHTNESS" ||
+                                status == "DIM" ||
+                                status == "BRIGHTNESS CHANGED" -> R.drawable.lightingbulb_on
+                        else -> R.drawable.lightbulb
+                    }
+
+                    val iconTint = when {
+                        isMotionLog -> Color.parseColor("#90EE90")
+                        status.contains("OFF", ignoreCase = true) ||
+                                status == "AUTO MODE" -> Color.parseColor("#A6A3A3")
+                        else -> Color.parseColor("#FFA500")
+                    }
+
+                    val titleText = when (status) {
                         "DETECTED", "CLEAR" -> "Motion"
-                        else                -> status
-                    }
-                    val subtitleText = when {
-                        isMotion -> "Motion sensor triggered"
-                        else     -> "Light manually turned off"
+                        else -> status
                     }
 
-                    // ── Row ──
+                    val subtitleText = when (status) {
+                        "DETECTED" -> "Motion sensor triggered"
+                        "CLEAR" -> "No motion detected"
+                        "LIGHT ON" -> "Light manually turned on"
+                        "LIGHT OFF" -> "Light manually turned off"
+                        "FULL BRIGHTNESS" -> "Brightness set to maximum"
+                        "DIM" -> "Brightness set to dim mode"
+                        "BRIGHTNESS CHANGED" -> "Brightness manually adjusted"
+                        "MANUAL MODE" -> "Manual override enabled"
+                        "AUTO MODE" -> "Automatic mode enabled"
+                        else -> "System activity recorded"
+                    }
+
                     val row = LinearLayout(this@ActivityLog).apply {
                         orientation = LinearLayout.HORIZONTAL
                         setPadding(0, 16, 0, 16)
@@ -103,42 +132,41 @@ class ActivityLog : AppCompatActivity() {
                         )
                     }
 
-                    // Icon
                     val iconBg = LinearLayout(this@ActivityLog).apply {
                         layoutParams = LinearLayout.LayoutParams(48, 48)
                         setBackgroundResource(R.drawable.tile_bg)
                         gravity = Gravity.CENTER
                     }
+
                     val icon = ImageView(this@ActivityLog).apply {
                         layoutParams = LinearLayout.LayoutParams(24, 24)
                         setImageResource(iconRes)
-                        imageTintList = android.content.res.ColorStateList.valueOf(
-                            if (isMotion) Color.parseColor("#90EE90")
-                            else Color.parseColor("#FFA500")
-                        )
+                        imageTintList = android.content.res.ColorStateList.valueOf(iconTint)
                     }
                     iconBg.addView(icon)
 
-                    // Text block
                     val textBlock = LinearLayout(this@ActivityLog).apply {
                         orientation = LinearLayout.VERTICAL
                         layoutParams = LinearLayout.LayoutParams(
-                            0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
+                            0,
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            1f
                         ).also { it.marginStart = 12 }
                     }
+
                     val title = TextView(this@ActivityLog).apply {
                         text = titleText
                         textSize = 15f
                         setTextColor(Color.WHITE)
                         setTypeface(null, android.graphics.Typeface.BOLD)
                     }
+
                     val subtitle = TextView(this@ActivityLog).apply {
                         text = subtitleText
                         textSize = 12f
                         setTextColor(Color.parseColor("#A6A3A3"))
                     }
 
-                    // Chips row
                     val chipsRow = LinearLayout(this@ActivityLog).apply {
                         orientation = LinearLayout.HORIZONTAL
                         layoutParams = LinearLayout.LayoutParams(
@@ -147,25 +175,28 @@ class ActivityLog : AppCompatActivity() {
                         ).also { it.topMargin = 4 }
                         gravity = Gravity.CENTER_VERTICAL
                     }
-                    chipsRow.addView(TextView(this@ActivityLog).apply {
-                        text = if (motion) "● ON" else "● OFF"
-                        textSize = 11f
-                        setTextColor(
-                            if (motion) Color.parseColor("#90EE90")
-                            else Color.parseColor("#A6A3A3")
-                        )
-                    })
 
-                    val brightness = log.child("brightness").getValue(Int::class.java)
-                    if (brightness != null && brightness > 0) {
+                    if (isMotionLog) {
                         chipsRow.addView(TextView(this@ActivityLog).apply {
-                            text = "  ✱ ${brightness}%"
+                            text = if (motion) "● ON" else "● OFF"
+                            textSize = 11f
+                            setTextColor(
+                                if (motion) Color.parseColor("#90EE90")
+                                else Color.parseColor("#A6A3A3")
+                            )
+                        })
+                    }
+
+                    if (brightness != null) {
+                        chipsRow.addView(TextView(this@ActivityLog).apply {
+                            text = if (isMotionLog) "  ✱ $brightness%" else "✱ $brightness%"
                             textSize = 11f
                             setTextColor(Color.parseColor("#A6A3A3"))
                         })
                     }
+
                     chipsRow.addView(TextView(this@ActivityLog).apply {
-                        text = "  $datePart"
+                        text = if (chipsRow.childCount > 0) "  $datePart" else datePart
                         textSize = 11f
                         setTextColor(Color.parseColor("#A6A3A3"))
                     })
@@ -174,17 +205,16 @@ class ActivityLog : AppCompatActivity() {
                     textBlock.addView(subtitle)
                     textBlock.addView(chipsRow)
 
-                    // Time
                     val timeView = TextView(this@ActivityLog).apply {
                         text = timePart
                         textSize = 12f
                         setTextColor(Color.parseColor("#A6A3A3"))
                     }
 
-                    // Divider
                     val divider = View(this@ActivityLog).apply {
                         layoutParams = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT, 1
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            1
                         )
                         setBackgroundColor(Color.parseColor("#1A3A50"))
                     }
@@ -192,6 +222,7 @@ class ActivityLog : AppCompatActivity() {
                     row.addView(iconBg)
                     row.addView(textBlock)
                     row.addView(timeView)
+
                     logContainer.addView(row)
                     logContainer.addView(divider)
                 }
@@ -211,6 +242,7 @@ class ActivityLog : AppCompatActivity() {
         dashboardBtn.setOnClickListener {
             startActivity(Intent(this, Dashboard::class.java))
         }
+
         controlBtn.setOnClickListener {
             startActivity(Intent(this, Control::class.java))
         }
