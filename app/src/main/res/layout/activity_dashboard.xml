@@ -153,11 +153,11 @@
                 android:layout_marginEnd="20dp">
 
                 <TextView
+                    android:id="@+id/ldrReading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/inter"
                     android:includeFontPadding="false"
-
                     android:textColor="#FE9D16"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -167,18 +167,18 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
                     android:fontFamily="@font/inter"
-                    android:text="lux"
+                    android:text="%"
                     android:textColor="#A6A3A3"
                     android:textStyle="bold" />
 
             </LinearLayout>
-
             <TextView
+                android:id="@+id/lightLevelText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:fontFamily="@font/inter"
-                android:text="Bright"
+                android:text="UNKNOWN"
                 android:textColor="#A6A3A3"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -399,9 +399,9 @@
                 android:background="@drawable/sun"
                 ></ImageView>
             <TextView
+                android:id="@+id/ldrMode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Daytime mode"
                 android:layout_marginStart="3dp"
                 android:textColor="#A6A3A3"/>
             <TextView
@@ -417,15 +417,15 @@
                 android:layout_marginStart="3dp"
                 android:textColor="#A6A3A3"/>
             <TextView
+                android:id="@+id/ldrModePercent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="999"
                 android:textColor="#A6A3A3"
                 android:layout_marginStart="3dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="lux"
+                android:text="%"
                 android:textColor="#A6A3A3"
                 android:layout_marginStart="3dp"/>
 

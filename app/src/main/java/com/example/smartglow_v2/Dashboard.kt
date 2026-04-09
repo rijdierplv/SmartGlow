@@ -40,6 +40,12 @@ class Dashboard : AppCompatActivity() {
         val brightnessLevelStatus = findViewById<TextView>(R.id.brightnessLevelStatus)
         val overrideTile = findViewById<TextView>(R.id.overrideTile)
         val motionTile = findViewById<TextView>(R.id.motionTile)
+        val nightTile = findViewById<TextView>(R.id.nightTile)
+
+        val ldrReading = findViewById<TextView>(R.id.ldrReading)
+        val lightLevelText = findViewById<TextView>(R.id.lightLevelText)
+        val ldrMode = findViewById<TextView>(R.id.ldrMode)
+        val ldrModePercent = findViewById<TextView>(R.id.ldrModePercent)
 
         val pirRef = FirebaseDatabase.getInstance().getReference("pir")
 
@@ -50,6 +56,31 @@ class Dashboard : AppCompatActivity() {
                 val isOn = snapshot.child("lightOn").getValue(Boolean::class.java) ?: false
                 val brightness = snapshot.child("brightness").getValue(Int::class.java) ?: 0
                 val mode = snapshot.child("mode").getValue(String::class.java) ?: "AUTO"
+
+                val rawLdrValue = snapshot.child("ldrValue").getValue(Int::class.java) ?: 0
+                val lightLevel = snapshot.child("lightLevel").getValue(String::class.java) ?: "UNKNOWN"
+
+                val ldrPercent = ((rawLdrValue / 4095.0) * 100).toInt().coerceIn(0, 100)
+
+                ldrReading.text = ldrPercent.toString()
+                lightLevelText.text = lightLevel
+                ldrModePercent.text = ldrPercent.toString()
+
+                if (lightLevel == "DARK") {
+                    ldrMode.text = "NightTime Mode"
+                    lightLevelText.setTextColor(android.graphics.Color.parseColor("#90EE90"))
+
+                    nightTile.backgroundTintList = ColorStateList.valueOf(
+                        android.graphics.Color.parseColor("#90EE90")
+                    )
+                    nightTile.setTextColor(android.graphics.Color.parseColor("#000000"))
+                } else {
+                    ldrMode.text = "DayTime Mode"
+                    lightLevelText.setTextColor(android.graphics.Color.parseColor("#A6A3A3"))
+
+                    nightTile.backgroundTintList = null
+                    nightTile.setTextColor(android.graphics.Color.WHITE)
+                }
 
                 motionStatus.text = status ?: "CLEAR"
                 motionStatus.setTextColor(
@@ -120,10 +151,20 @@ class Dashboard : AppCompatActivity() {
                 brightnessLevel.text = "0"
                 brightnessLevelStatus.text = "OFF"
                 brightnessLevelStatus.setTextColor(android.graphics.Color.parseColor("#A6A3A3"))
+
                 overrideTile.backgroundTintList = null
                 overrideTile.setTextColor(android.graphics.Color.WHITE)
+
                 motionTile.backgroundTintList = null
                 motionTile.setTextColor(android.graphics.Color.WHITE)
+
+                nightTile.backgroundTintList = null
+                nightTile.setTextColor(android.graphics.Color.WHITE)
+
+                ldrReading.text = "0"
+                lightLevelText.text = "UNKNOWN"
+                ldrMode.text = "DayTime Mode"
+                ldrModePercent.text = "0"
             }
         })
 
