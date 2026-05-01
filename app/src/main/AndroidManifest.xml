@@ -18,6 +18,9 @@
             android:name=".ActivityLog"
             android:exported="false" />
         <activity
+            android:name=".Control"
+            android:exported="false"/>
+        <activity
             android:name=".SignUp"
             android:exported="false" />
         <activity
@@ -31,10 +34,7 @@
             android:exported="false" />
         <activity
             android:name=".WelcomeScreen"
-            android:exported="false" />
-        <activity
-            android:name=".Control"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

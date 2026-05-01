@@ -41,6 +41,59 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:paddingBottom="16dp">
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="#0A3D56"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="14dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/user" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Manual Override"
+                            android:textColor="@color/white"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="You have full control of the lights"
+                            android:textColor="#A6A3A3"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <Switch
+                        android:id="@+id/switchManualOverride"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:thumbTint="#FFFFFF"
+                        android:trackTint="#FFA500" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <!-- ===== POWER SECTION ===== -->
             <TextView
@@ -84,7 +137,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Street Light"
+                            android:text="Street Light 1"
                             android:textColor="@color/white"
                             android:textSize="15sp" />
 
@@ -133,6 +186,13 @@
                     android:orientation="vertical"
                     android:padding="14dp">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="STREET 1"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"/>
+
                     <!-- Brightness percentage label -->
                     <TextView
                         android:id="@+id/tvBrightnessValue"
@@ -174,15 +234,135 @@
                             android:layout_height="24dp"
                             android:src="@drawable/ambient" />
                     </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal"
+                        android:weightSum="3">
+
+                        <!-- FULL BRIGHTNESS -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            app:cardBackgroundColor="#042739"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp">
+
+                            <LinearLayout
+                                android:id="@+id/btnFullBrightness"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ambient"
+                                    android:backgroundTint="#A6A3A3" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="FULL\nBRIGHTNESS"
+                                    android:gravity="center"
+                                    android:textColor="#A6A3A3"
+                                    android:textSize="10sp" />
+
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- DIM (40%) -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="3dp"
+                            android:layout_marginEnd="3dp"
+                            app:cardBackgroundColor="#042739"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp">
+
+                            <LinearLayout
+                                android:id="@+id/btnDim"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ambient"
+                                    android:backgroundTint="#A6A3A3" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="DIM\n(40 %)"
+                                    android:gravity="center"
+                                    android:textColor="#A6A3A3"
+                                    android:textSize="10sp" />
+
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- ALL OFF -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="6dp"
+                            app:cardBackgroundColor="#7B1A1A"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp">
+
+                            <LinearLayout
+                                android:id="@+id/btnAllOff"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/sun"
+                                    android:backgroundTint="#FF4444" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="OFF\n"
+                                    android:gravity="center"
+                                    android:textColor="#FF4444"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
-            <!-- ===== OPERATING MODE SECTION ===== -->
+            <!-- ===== POWER SECTION ===== -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="OPERATING MODE"
+                android:layout_marginTop="12dp"
+                android:text="POWER"
                 android:textColor="#A6A3A3"
                 android:textSize="12sp"
                 android:letterSpacing="0.15" />
@@ -203,10 +383,11 @@
                     android:gravity="center_vertical">
 
                     <ImageView
+                        android:id="@+id/lightLogoStatus2"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/user"
-                        android:tint="#A6A3A3" />
+                        android:src="@drawable/lightbulb"
+                        />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -218,164 +399,224 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Manual Override"
+                            android:text="Street Light 2"
                             android:textColor="@color/white"
                             android:textSize="15sp" />
 
                         <TextView
+                            android:id="@+id/tvStreetLightStatus2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="You have full control of the lights"
+                            android:text="Currently OFF"
                             android:textColor="#A6A3A3"
                             android:textSize="12sp" />
 
                     </LinearLayout>
 
                     <Switch
-                        android:id="@+id/switchManualOverride"
+                        android:id="@+id/switchStreetLight2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="false"
                         android:thumbTint="#FFFFFF"
-                        android:trackTint="#FFA500" />
+                        android:trackTint="#555555" />
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
-            <!-- ===== QUICK ACTIONS SECTION ===== -->
+            <!-- ===== BRIGHTNESS SECTION ===== -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="QUICK ACTIONS"
+                android:text="BRIGHTNESS"
                 android:textColor="#A6A3A3"
                 android:textSize="12sp"
                 android:letterSpacing="0.15" />
-
-            <LinearLayout
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                android:weightSum="3">
+                app:cardBackgroundColor="#0A3D56"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
 
-                <!-- FULL BRIGHTNESS -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    app:cardBackgroundColor="#0A3D56"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="STREET 2"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"/>
+
+                    <!-- Brightness percentage label -->
+                    <TextView
+                        android:id="@+id/tvBrightnessValue2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="0%"
+                        android:textColor="#FFA500"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <!-- Brightness row: dim icon, seekbar, bright icon -->
                     <LinearLayout
-                        android:id="@+id/btnFullBrightness"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="16dp"
-                        android:clickable="true"
-                        android:focusable="true">
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
                         <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/ambient"
-                            android:backgroundTint="#A6A3A3" />
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/sun" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <SeekBar
+                            android:id="@+id/seekBarBrightness2"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:text="FULL\nBRIGHTNESS"
-                            android:gravity="center"
-                            android:textColor="#A6A3A3"
-                            android:textSize="10sp" />
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#A6A3A3"
+                            android:thumbTint="#FFFFFF" />
 
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ambient" />
                     </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- DIM (40%) -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="3dp"
-                    android:layout_marginEnd="3dp"
-                    app:cardBackgroundColor="#0A3D56"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
-
                     <LinearLayout
-                        android:id="@+id/btnDim"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="16dp"
-                        android:clickable="true"
-                        android:focusable="true">
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal"
+                        android:weightSum="3">
 
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/ambient"
-                            android:backgroundTint="#A6A3A3" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <!-- FULL BRIGHTNESS -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:text="DIM\n(40 %)"
-                            android:gravity="center"
-                            android:textColor="#A6A3A3"
-                            android:textSize="10sp" />
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            app:cardBackgroundColor="#042739"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp">
+
+                            <LinearLayout
+                                android:id="@+id/btnFullBrightness2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ambient"
+                                    android:backgroundTint="#A6A3A3" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="FULL\nBRIGHTNESS"
+                                    android:gravity="center"
+                                    android:textColor="#A6A3A3"
+                                    android:textSize="10sp" />
+
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- DIM (40%) -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="3dp"
+                            android:layout_marginEnd="3dp"
+                            app:cardBackgroundColor="#042739"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp">
+
+                            <LinearLayout
+                                android:id="@+id/btnDim2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ambient"
+                                    android:backgroundTint="#A6A3A3" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="DIM\n(40 %)"
+                                    android:gravity="center"
+                                    android:textColor="#A6A3A3"
+                                    android:textSize="10sp" />
+
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <!-- ALL OFF -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="6dp"
+                            app:cardBackgroundColor="#7B1A1A"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp">
+
+                            <LinearLayout
+                                android:id="@+id/btnAllOff2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:clickable="true"
+                                android:focusable="true">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/sun"
+                                    android:backgroundTint="#FF4444" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="OFF\n"
+                                    android:gravity="center"
+                                    android:textColor="#FF4444"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
 
                     </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- ALL OFF -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="6dp"
-                    app:cardBackgroundColor="#7B1A1A"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
-
-                    <LinearLayout
-                        android:id="@+id/btnAllOff"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="16dp"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/sun"
-                            android:backgroundTint="#FF4444" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:text="ALL\nOFF"
-                            android:gravity="center"
-                            android:textColor="#FF4444"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-            </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
     </ScrollView>
@@ -493,7 +734,6 @@
                 android:text="Profile"
                 android:textColor="#A6A3A3"
                 />
-
         </LinearLayout>
 
     </LinearLayout>

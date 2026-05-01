@@ -26,24 +26,45 @@ import java.util.Locale
 
 class Control : AppCompatActivity() {
 
-    private lateinit var activityLogBtn: ImageButton
-    private lateinit var dashboardBtn: ImageButton
+    // ── Shared ────────────────────────────────────────────────────
+    private lateinit var switchManualOverride: Switch
+
+    // ── Street 1 views ────────────────────────────────────────────
+    private lateinit var switchStreetLight: Switch
     private lateinit var tvStreetLightStatus: TextView
     private lateinit var seekBarBrightness: SeekBar
     private lateinit var tvBrightnessValue: TextView
-    private lateinit var switchStreetLight: Switch
-    private lateinit var switchManualOverride: Switch
     private lateinit var btnFullBrightness: LinearLayout
     private lateinit var btnDim: LinearLayout
     private lateinit var btnAllOff: LinearLayout
     private lateinit var lightLogoStatus: ImageView
 
-    private lateinit var pirRef: DatabaseReference
-    private lateinit var logsRef: DatabaseReference
+    // ── Street 2 views ────────────────────────────────────────────
+    private lateinit var switchStreetLight2: Switch
+    private lateinit var tvStreetLightStatus2: TextView
+    private lateinit var seekBarBrightness2: SeekBar
+    private lateinit var tvBrightnessValue2: TextView
+    private lateinit var btnFullBrightness2: LinearLayout
+    private lateinit var btnDim2: LinearLayout
+    private lateinit var btnAllOff2: LinearLayout
+    private lateinit var lightLogoStatus2: ImageView
 
-    private var isSyncingUi = false
-    private var currentBrightness = 0
-    private var currentLightOn = false
+    // ── Firebase refs ─────────────────────────────────────────────
+    private lateinit var street1Ref: DatabaseReference
+    private lateinit var street2Ref: DatabaseReference
+    private lateinit var logs1Ref: DatabaseReference
+    private lateinit var logs2Ref: DatabaseReference
+
+    // ── UI sync guards ────────────────────────────────────────────
+    private var isSyncingS1       = false
+    private var isSyncingS2       = false
+    private var isSyncingOverride = false
+
+    // ── Cached state ──────────────────────────────────────────────
+    private var s1Brightness = 0
+    private var s1LightOn    = false
+    private var s2Brightness = 0
+    private var s2LightOn    = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,140 +79,173 @@ class Control : AppCompatActivity() {
 
         bindViews()
 
-        pirRef = FirebaseDatabase.getInstance().getReference("pir")
-        logsRef = FirebaseDatabase.getInstance().getReference("pirLogs")
+        street1Ref = FirebaseDatabase.getInstance().getReference("sensors_street1")
+        street2Ref = FirebaseDatabase.getInstance().getReference("sensors_street2")
+        logs1Ref   = FirebaseDatabase.getInstance().getReference("Logs_street1")
+        logs2Ref   = FirebaseDatabase.getInstance().getReference("Logs_street2")
 
-        listenToFirebase()
-        setupListeners()
+        listenStreet1Firebase()
+        listenStreet2Firebase()
+        setupManualOverrideListener()
+        setupStreet1Listeners()
+        setupStreet2Listeners()
         setupNavigation()
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    //  BIND VIEWS
+    // ═══════════════════════════════════════════════════════════════
     private fun bindViews() {
-        activityLogBtn = findViewById(R.id.activityLogBtn)
-        dashboardBtn = findViewById(R.id.dashboardBtn)
-        tvStreetLightStatus = findViewById(R.id.tvStreetLightStatus)
-        seekBarBrightness = findViewById(R.id.seekBarBrightness)
-        tvBrightnessValue = findViewById(R.id.tvBrightnessValue)
-        switchStreetLight = findViewById(R.id.switchStreetLight)
-        switchManualOverride = findViewById(R.id.switchManualOverride)
-        btnFullBrightness = findViewById(R.id.btnFullBrightness)
-        btnDim = findViewById(R.id.btnDim)
-        btnAllOff = findViewById(R.id.btnAllOff)
-        lightLogoStatus = findViewById(R.id.lightLogoStatus)
+        switchManualOverride  = findViewById(R.id.switchManualOverride)
+
+        // Street 1
+        switchStreetLight     = findViewById(R.id.switchStreetLight)
+        tvStreetLightStatus   = findViewById(R.id.tvStreetLightStatus)
+        seekBarBrightness     = findViewById(R.id.seekBarBrightness)
+        tvBrightnessValue     = findViewById(R.id.tvBrightnessValue)
+        btnFullBrightness     = findViewById(R.id.btnFullBrightness)
+        btnDim                = findViewById(R.id.btnDim)
+        btnAllOff             = findViewById(R.id.btnAllOff)
+        lightLogoStatus       = findViewById(R.id.lightLogoStatus)
+
+        // Street 2
+        switchStreetLight2    = findViewById(R.id.switchStreetLight2)
+        tvStreetLightStatus2  = findViewById(R.id.tvStreetLightStatus2)
+        seekBarBrightness2    = findViewById(R.id.seekBarBrightness2)
+        tvBrightnessValue2    = findViewById(R.id.tvBrightnessValue2)
+        btnFullBrightness2    = findViewById(R.id.btnFullBrightness2)
+        btnDim2               = findViewById(R.id.btnDim2)
+        btnAllOff2            = findViewById(R.id.btnAllOff2)
+        lightLogoStatus2      = findViewById(R.id.lightLogoStatus2)
     }
 
-    private fun listenToFirebase() {
-        pirRef.addValueEventListener(object : ValueEventListener {
+    // ═══════════════════════════════════════════════════════════════
+    //  FIREBASE LISTENERS
+    // ═══════════════════════════════════════════════════════════════
+    private fun listenStreet1Firebase() {
+        street1Ref.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val isOn = snapshot.child("lightOn").getValue(Boolean::class.java) ?: false
+                val isOn       = snapshot.child("lightOn").getValue(Boolean::class.java) ?: false
                 val brightness = snapshot.child("brightness").getValue(Int::class.java) ?: 0
-                val mode = snapshot.child("mode").getValue(String::class.java) ?: "AUTO"
+                val mode       = snapshot.child("mode").getValue(String::class.java) ?: "AUTO"
 
-                currentLightOn = isOn
-                currentBrightness = brightness
+                s1LightOn    = isOn
+                s1Brightness = brightness
 
-                isSyncingUi = true
+                isSyncingS1 = true
                 switchStreetLight.isChecked = isOn
-                switchManualOverride.isChecked = mode == "MANUAL"
-                updateLightUi(isOn, brightness)
-                isSyncingUi = false
+                // Street 1 is the source of truth for the shared override switch
+                if (!isSyncingOverride) {
+                    isSyncingOverride = true
+                    switchManualOverride.isChecked = (mode == "MANUAL")
+                    isSyncingOverride = false
+                }
+                updateStreet1Ui(isOn, brightness)
+                isSyncingS1 = false
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(
-                    this@Control,
-                    "Failed to load data: ${error.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this@Control, "Street 1: Failed to load data", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    private fun setupListeners() {
+    private fun listenStreet2Firebase() {
+        street2Ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val isOn       = snapshot.child("lightOn").getValue(Boolean::class.java) ?: false
+                val brightness = snapshot.child("brightness").getValue(Int::class.java) ?: 0
+                // mode for Street 2 is driven by the shared switch; no need to read it here
+
+                s2LightOn    = isOn
+                s2Brightness = brightness
+
+                isSyncingS2 = true
+                switchStreetLight2.isChecked = isOn
+                updateStreet2Ui(isOn, brightness)
+                isSyncingS2 = false
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@Control, "Street 2: Failed to load data", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  SINGLE MANUAL OVERRIDE — writes mode to BOTH streets
+    // ═══════════════════════════════════════════════════════════════
+    private fun setupManualOverrideListener() {
+        switchManualOverride.setOnCheckedChangeListener { _, checked ->
+            if (isSyncingOverride) return@setOnCheckedChangeListener
+
+            val mode = if (checked) "MANUAL" else "AUTO"
+
+            street1Ref.child("mode").setValue(mode)
+            street2Ref.child("mode").setValue(mode)
+
+            val logStatus = if (checked) "MANUAL MODE" else "AUTO MODE"
+            saveLog(logs1Ref, logStatus, false, s1Brightness)
+            saveLog(logs2Ref, logStatus, false, s2Brightness)
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  STREET 1 – INTERACTION LISTENERS
+    // ═══════════════════════════════════════════════════════════════
+    private fun setupStreet1Listeners() {
+
         switchStreetLight.setOnCheckedChangeListener { _, checked ->
-            if (isSyncingUi) return@setOnCheckedChangeListener
+            if (isSyncingS1) return@setOnCheckedChangeListener
 
             if (checked && !switchManualOverride.isChecked) {
-                isSyncingUi = true
+                isSyncingS1 = true
                 switchStreetLight.isChecked = false
-                isSyncingUi = false
-
-                Toast.makeText(
-                    this,
-                    "Turn on Manual Override first to turn on the light.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                isSyncingS1 = false
+                Toast.makeText(this, "Turn on Manual Override first.", Toast.LENGTH_SHORT).show()
                 return@setOnCheckedChangeListener
             }
 
             val brightness = if (checked) 100 else 0
-            currentLightOn = checked
-            currentBrightness = brightness
+            s1LightOn    = checked
+            s1Brightness = brightness
 
-            updateLightUi(checked, brightness)
-            pirRef.child("lightOn").setValue(checked)
-            pirRef.child("brightness").setValue(brightness)
-
-            saveLog(
-                status = if (checked) "LIGHT ON" else "LIGHT OFF",
-                motion = false,
-                brightness = brightness
-            )
-        }
-
-        switchManualOverride.setOnCheckedChangeListener { _, checked ->
-            if (isSyncingUi) return@setOnCheckedChangeListener
-
-            val mode = if (checked) "MANUAL" else "AUTO"
-            pirRef.child("mode").setValue(mode)
-
-            saveLog(
-                status = if (checked) "MANUAL MODE" else "AUTO MODE",
-                motion = false,
-                brightness = currentBrightness
-            )
+            updateStreet1Ui(checked, brightness)
+            street1Ref.child("lightOn").setValue(checked)
+            street1Ref.child("brightness").setValue(brightness)
+            saveLog(logs1Ref, if (checked) "LIGHT ON" else "LIGHT OFF", false, brightness)
         }
 
         seekBarBrightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (!fromUser || isSyncingUi) return
+                if (!fromUser || isSyncingS1) return
 
                 if (!switchManualOverride.isChecked) {
-                    isSyncingUi = true
-                    applyBrightness(seekBarBrightness, tvBrightnessValue, currentBrightness)
-                    isSyncingUi = false
-
-                    Toast.makeText(
-                        this@Control,
-                        "Turn on Manual Override first to adjust brightness.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    isSyncingS1 = true
+                    applyBrightness(seekBarBrightness, tvBrightnessValue, s1Brightness)
+                    isSyncingS1 = false
+                    Toast.makeText(this@Control, "Turn on Manual Override first.", Toast.LENGTH_SHORT).show()
                     return
                 }
 
                 val isOn = progress > 0
-                currentLightOn = isOn
-                currentBrightness = progress
+                s1LightOn    = isOn
+                s1Brightness = progress
 
-                isSyncingUi = true
+                isSyncingS1 = true
                 switchStreetLight.isChecked = isOn
-                isSyncingUi = false
+                isSyncingS1 = false
 
-                updateLightUi(isOn, progress)
-                pirRef.child("lightOn").setValue(isOn)
-                pirRef.child("brightness").setValue(progress)
+                updateStreet1Ui(isOn, progress)
+                street1Ref.child("lightOn").setValue(isOn)
+                street1Ref.child("brightness").setValue(progress)
 
-                val status = when {
-                    progress == 100 -> "FULL BRIGHTNESS"
-                    progress == 0 -> "LIGHT OFF"
+                val status = when (progress) {
+                    100  -> "FULL BRIGHTNESS"
+                    0    -> "LIGHT OFF"
                     else -> "BRIGHTNESS CHANGED"
                 }
-
-                saveLog(
-                    status = status,
-                    motion = false,
-                    brightness = progress
-                )
+                saveLog(logs1Ref, status, false, progress)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -203,12 +257,7 @@ class Control : AppCompatActivity() {
                 Toast.makeText(this, "Turn on Manual Override first.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
-            setManualLightState(
-                isOn = true,
-                brightness = 100,
-                status = "FULL BRIGHTNESS"
-            )
+            setStreet1State(true, 100, "FULL BRIGHTNESS")
         }
 
         btnDim.setOnClickListener {
@@ -216,88 +265,178 @@ class Control : AppCompatActivity() {
                 Toast.makeText(this, "Turn on Manual Override first.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
-            setManualLightState(
-                isOn = true,
-                brightness = 40,
-                status = "DIM"
-            )
+            setStreet1State(true, 40, "DIM")
         }
 
         btnAllOff.setOnClickListener {
-            setManualLightState(
-                isOn = false,
-                brightness = 0,
-                status = "LIGHT OFF"
-            )
+            setStreet1State(false, 0, "LIGHT OFF")
         }
     }
 
-    private fun setupNavigation() {
-        dashboardBtn.setOnClickListener {
-            startActivity(Intent(this, Dashboard::class.java))
+    private fun setStreet1State(isOn: Boolean, brightness: Int, status: String) {
+        s1LightOn    = isOn
+        s1Brightness = brightness
+
+        isSyncingS1 = true
+        switchStreetLight.isChecked = isOn
+        isSyncingS1 = false
+
+        updateStreet1Ui(isOn, brightness)
+        street1Ref.child("lightOn").setValue(isOn)
+        street1Ref.child("brightness").setValue(brightness)
+        saveLog(logs1Ref, status, false, brightness)
+    }
+
+    private fun updateStreet1Ui(isOn: Boolean, brightness: Int) {
+        tvStreetLightStatus.text = if (isOn) "Currently ON" else "Currently OFF"
+        lightLogoStatus.setImageResource(
+            if (isOn) R.drawable.lightingbulb_on else R.drawable.lightbulb
+        )
+        applyBrightness(seekBarBrightness, tvBrightnessValue, brightness)
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  STREET 2 – INTERACTION LISTENERS
+    // ═══════════════════════════════════════════════════════════════
+    private fun setupStreet2Listeners() {
+
+        switchStreetLight2.setOnCheckedChangeListener { _, checked ->
+            if (isSyncingS2) return@setOnCheckedChangeListener
+
+            if (checked && !switchManualOverride.isChecked) {
+                isSyncingS2 = true
+                switchStreetLight2.isChecked = false
+                isSyncingS2 = false
+                Toast.makeText(this, "Turn on Manual Override first.", Toast.LENGTH_SHORT).show()
+                return@setOnCheckedChangeListener
+            }
+
+            val brightness = if (checked) 100 else 0
+            s2LightOn    = checked
+            s2Brightness = brightness
+
+            updateStreet2Ui(checked, brightness)
+            street2Ref.child("lightOn").setValue(checked)
+            street2Ref.child("brightness").setValue(brightness)
+            saveLog(logs2Ref, if (checked) "LIGHT ON" else "LIGHT OFF", false, brightness)
         }
 
-        activityLogBtn.setOnClickListener {
+        seekBarBrightness2.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (!fromUser || isSyncingS2) return
+
+                if (!switchManualOverride.isChecked) {
+                    isSyncingS2 = true
+                    applyBrightness(seekBarBrightness2, tvBrightnessValue2, s2Brightness)
+                    isSyncingS2 = false
+                    Toast.makeText(this@Control, "Turn on Manual Override first.", Toast.LENGTH_SHORT).show()
+                    return
+                }
+
+                val isOn = progress > 0
+                s2LightOn    = isOn
+                s2Brightness = progress
+
+                isSyncingS2 = true
+                switchStreetLight2.isChecked = isOn
+                isSyncingS2 = false
+
+                updateStreet2Ui(isOn, progress)
+                street2Ref.child("lightOn").setValue(isOn)
+                street2Ref.child("brightness").setValue(progress)
+
+                val status = when (progress) {
+                    100  -> "FULL BRIGHTNESS"
+                    0    -> "LIGHT OFF"
+                    else -> "BRIGHTNESS CHANGED"
+                }
+                saveLog(logs2Ref, status, false, progress)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        btnFullBrightness2.setOnClickListener {
+            if (!switchManualOverride.isChecked) {
+                Toast.makeText(this, "Turn on Manual Override first.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            setStreet2State(true, 100, "FULL BRIGHTNESS")
+        }
+
+        btnDim2.setOnClickListener {
+            if (!switchManualOverride.isChecked) {
+                Toast.makeText(this, "Turn on Manual Override first.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            setStreet2State(true, 40, "DIM")
+        }
+
+        btnAllOff2.setOnClickListener {
+            setStreet2State(false, 0, "LIGHT OFF")
+        }
+    }
+
+    private fun setStreet2State(isOn: Boolean, brightness: Int, status: String) {
+        s2LightOn    = isOn
+        s2Brightness = brightness
+
+        isSyncingS2 = true
+        switchStreetLight2.isChecked = isOn
+        isSyncingS2 = false
+
+        updateStreet2Ui(isOn, brightness)
+        street2Ref.child("lightOn").setValue(isOn)
+        street2Ref.child("brightness").setValue(brightness)
+        saveLog(logs2Ref, status, false, brightness)
+    }
+
+    private fun updateStreet2Ui(isOn: Boolean, brightness: Int) {
+        tvStreetLightStatus2.text = if (isOn) "Currently ON" else "Currently OFF"
+        lightLogoStatus2.setImageResource(
+            if (isOn) R.drawable.lightingbulb_on else R.drawable.lightbulb
+        )
+        applyBrightness(seekBarBrightness2, tvBrightnessValue2, brightness)
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  NAVIGATION
+    // ═══════════════════════════════════════════════════════════════
+    private fun setupNavigation() {
+        findViewById<ImageButton>(R.id.dashboardBtn).setOnClickListener {
+            startActivity(Intent(this, Dashboard::class.java))
+        }
+        findViewById<ImageButton>(R.id.activityLogBtn).setOnClickListener {
             startActivity(Intent(this, ActivityLog::class.java))
         }
     }
 
-    private fun setManualLightState(isOn: Boolean, brightness: Int, status: String) {
-        currentLightOn = isOn
-        currentBrightness = brightness
-
-        isSyncingUi = true
-        switchStreetLight.isChecked = isOn
-        isSyncingUi = false
-
-        updateLightUi(isOn, brightness)
-        pirRef.child("lightOn").setValue(isOn)
-        pirRef.child("brightness").setValue(brightness)
-
-        saveLog(
-            status = status,
-            motion = false,
-            brightness = brightness
-        )
-    }
-
-    private fun updateLightUi(isOn: Boolean, brightness: Int) {
-        tvStreetLightStatus.text = if (isOn) "Currently ON" else "Currently OFF"
-        applyLightIcon(lightLogoStatus, isOn)
-        applyBrightness(seekBarBrightness, tvBrightnessValue, brightness)
-    }
-
-    private fun saveLog(status: String, motion: Boolean = false, brightness: Int = 0) {
-        val currentDateTime = SimpleDateFormat(
-            "yyyy-MM-dd hh:mm:ss a",
-            Locale.getDefault()
-        ).format(Date())
-
+    // ═══════════════════════════════════════════════════════════════
+    //  SHARED HELPERS
+    // ═══════════════════════════════════════════════════════════════
+    private fun saveLog(
+        ref: DatabaseReference,
+        status: String,
+        motion: Boolean = false,
+        brightness: Int = 0
+    ) {
+        val dt = SimpleDateFormat("yyyy-MM-dd hh:mm:ss a", Locale.getDefault()).format(Date())
         val logData = mapOf(
-            "status" to status,
-            "motion" to motion,
+            "status"     to status,
+            "motion"     to motion,
             "brightness" to brightness,
-            "datetime" to currentDateTime
+            "datetime"   to dt
         )
-
-        logsRef.push().setValue(logData)
-    }
-
-    private fun applyLightIcon(imageView: ImageView, isOn: Boolean) {
-        imageView.setImageResource(
-            if (isOn) R.drawable.lightingbulb_on else R.drawable.lightbulb
-        )
+        ref.push().setValue(logData)
     }
 
     private fun applyBrightness(seekBar: SeekBar, label: TextView, progress: Int) {
         seekBar.progress = progress
         label.text = "$progress%"
-        val color = if (progress == 0) {
-            Color.parseColor("#A6A3A3")
-        } else {
-            Color.parseColor("#FFA500")
-        }
+
+        val color = if (progress == 0) Color.parseColor("#A6A3A3")
+        else Color.parseColor("#FFA500")
 
         label.setTextColor(color)
 
