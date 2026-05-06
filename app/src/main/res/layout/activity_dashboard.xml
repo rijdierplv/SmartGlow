@@ -983,9 +983,11 @@
             android:orientation="vertical">
 
             <ImageButton
+                android:id="@+id/profileBtn"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="@drawable/user" />
+                android:background="@drawable/user"
+                android:backgroundTint="#A6A3A3" />
 
             <TextView
                 android:layout_width="wrap_content"
